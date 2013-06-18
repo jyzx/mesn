@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>mesn</title>
+<style>
+body, input, textarea { font: 14px/1.5 'Helvetica Neue','Segoe UI',Tahoma,'Hiragino Sans GB','Hiragino Kaku Gothic Pro','Microsoft YaHei',sans-serif; }
+body { color: #444; }
+h3 { margin: 0 0 8px 0; }
+li { list-style: none; padding-top: 15px; }
+label { min-width: 20px; display: inline-block; }
+input, textarea { padding: 3px; color: #666; border: 1px solid #ddd; }
+.err { color: red; border: 1px solid #f66; padding: 3px 10px; background-color: #ffdada; }
+.wp { min-width: 800px; }
+.wp span { color: #ccc; width: 150px; display: inline-block; }
+</style>
+</head>
+<body>
+  
+  <ul class="wp">
+    <li><p id="err"></p></li>
+    <li>
+      <h3>@用户</h3>
+      <label for="uid">uid</label>
+      <input id="uid" type="text" value="">
+      <span>(e.g. 2649482)</span>
+      <label for="uname">用户姓名</label>
+      <input id="uname" type="text" value="">
+      <span>(e.g. 邢丹平)</span>
+    </li>
+    <li>
+      <h3>@专区</h3>
+      <label for="fid">fid</label>
+      <input id="fid" type="text" value="">
+      <span>(e.g. 1910)</span>
+      <label for="fname">专区名称</label>
+      <input id="fname" type="text" value="">
+      <span>(e.g. 员工岗位创新)</span>
+    </li>
+    <li>
+      <h3>#标签#</h3>
+      <label for="tagname">#</label>
+      <input id="tagid" type="hidden" value="">
+      <input id="tagname" type="text" value="">
+      <span>(e.g. 去电信化大讨论)</span>
+    </li>
+    <li>
+      <h3>内容</h3>
+      <textarea id="content" cols="70" rows="4">我的想法是</textarea>
+
+    </li>
+    <li>
+      <button id="btCreate">生成mesn编码</button>
+    </li>
+    <li>
+      <div style="position:relative; display:inline-block; *display:inline;">
+        <p style="position:absolute; top:-55px;right:0;    *top:-28px;">
+          <button id="btSelect">选择编码</button>
+          <label><复制 ctrl+c></label>
+        </p>
+        <textarea id="pre" cols="70" rows="5" readonly="readonly">mesn#type=post&pre=</textarea>
+      </div>
+    </li>
+  </ul>
+  
+<script src="http://home.myctu.cn/static/js/jquery-1.7.2.js" type="text/javascript" charset="utf-8"></script>
+<script>
+$('#btCreate').click(createPre);
+$('#btSelect').click(performCopy);
+
+function createPre() {
+  var uid = $.trim($('#uid').val());
+  var uname = $.trim($('#uname').val());
+  var fid = $.trim($('#fid').val());
+  var fname = $.trim($('#fname').val());
+  var tagname = $.trim($('#tagname').val());
+  var content = $('#content').val();
+
+  var chkVal = function () {
+    var errinfo = '';
+
+    if (uid.length == 0) { errinfo += '- “uid” 没有填写 <br>'; }
+    else { 
+      uid = parseInt(uid, 10);
+      if (isNaN(uid)) { errinfo += '- “uid” 不是由数字组成 <br>'; }
+    }
+
+    if (uname.length == 0) { errinfo += '- “用户姓名” 没有填写 <br>'; }
+
+    if (fid.length == 0) { errinfo += '- “fid” 没有填写 <br>'; }
+    else { 
+      fid = parseInt(fid, 10);
+      if (isNaN(fid)) { errinfo += '- “fid” 不是由数字组成 <br>'; }
+    }
+
+    if (fname.length == 0) { errinfo += '- “专区名称” 没有填写 <br>'; }
+
+    return errinfo;
+  }
+
+  $('#err').removeClass('err').html('');
+
+  var err = chkVal();
+  if (err.length > 0) {
+    $('#err').addClass('err').html(err);
+    return false;
+  }
+
+
+  var pre = {'pre': []};
+
+  var o1 = {};
+  o1['type'] = 'user';
+  o1['id'] = uid;
+  o1['name'] = uname;
+  pre['pre'].push(o1);
+
+  var o2 = {};
+  o2['type'] = 'zone';
+  o2['id'] = fid;
+  o2['name'] = fname;
+  pre['pre'].push(o2);
+
+  var o3 = {};
+  o3['type'] = 'tag';
+  o3['id'] = '';
+  o3['name'] = tagname;
+  pre['pre'].push(o3);
+
+  var o4 = {};
+  o4['type'] = 'text';
+  o4['content'] = content;
+  pre['pre'].push(o4);
+
+  // console.log(pre);
+
+  // var pre = '{"pre":[{"type":"user","id":"2649482","name":"邢丹平"},{"type":"zone","id":"1910",name":"员工岗位创新"},{"type":"tag","id":"","name":"去电信化大讨论"},{"type":"text","content":"我的想法是"}]}';
+
+  // var obj = $.parseJSON(pre);
+  // console.log(obj);
+
+  $('#pre').val('mesn#type=post&pre=' + $.param(pre));
+}
+
+
+
+// put your data on the textarea and select all
+function performCopy() {
+    // $("#pre").text('PUT THE TEXT TO COPY HERE. CAN BE A FUNCTION.');
+    $("#pre")[0].focus();
+    $("#pre")[0].select();
+};
+
+
+</script>
+  
+</body>
+</html>
